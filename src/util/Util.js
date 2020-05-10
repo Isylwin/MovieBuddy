@@ -3,14 +3,15 @@ function getActiveUser() {
   // GET EMAIL ADDRESS OF ACTIVE USER
   var email = Session.getEffectiveUser().getEmail();
   
-  if (email = "oscardeleeuw@hotmail.com") {
-    return "Oscar"
-  }
-  if (email = "j.vorstenbosche@gmail.com") {
-    return "Jochem" 
-  }
-  if (email = "happynu3@gmail.com") {
-    return "Bram"
+  switch(email) {
+    case "oscardeleeuw@hotmail.com":
+      return "Oscar"
+    case "j.vorstenbosche@gmail.com":
+      return "Jochem"
+    case "happynu3@gmail.com":
+      return "Bram"
+    default:
+      throw "Hoeren"
   }
 }
 
