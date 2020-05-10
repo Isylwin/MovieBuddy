@@ -17,12 +17,12 @@ function searchMovies() {
   var firstRow = findInColumn(searcherSheet, 1, SearchResultID) + 1 
   
   var result = ImportJSON(url, "", "noInherit, noTruncate");
-  var omdbSData = new OMDB_S_Data(result)
+  var omdbSData = omdbSArrayFromJsonResult(result)
   
   searcherSheet.getRange(firstRow, 1, searcherSheet.getLastRow(), searcherSheet.getLastColumn()).removeCheckboxes()
   searcherSheet.getRange(firstRow, 1, searcherSheet.getLastRow(), searcherSheet.getLastColumn()).clearContent()
   
-  omdbSDataToSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName("MovieSearcher"), omdbSData)
+  omdbSArrayToSheet(SpreadsheetApp.getActiveSpreadsheet().getSheetByName("MovieSearcher"), omdbSData)
   
   searcherSheet.autoResizeColumns(1, searcherSheet.getLastColumn())
 }
@@ -36,11 +36,10 @@ function addMovieDataToSheet() {
   var dataSheet = ss.getSheetByName(dataSheetName);
   
   var firstRow = findInColumn(searcherSheet, 1, SearchResultID) + 2
-  var moviesToAdd = searcherSheet.getRange(firstRow, 1, searcherSheet.getLastRow() - firstRow, 6).getValues();
+  var omdbSArray = omdbSArrayFromSheet(searcherSheet, firstRow, 1)
   
-  for (var i in moviesToAdd) {
-    parseMovie(moviesToAdd[i], dataSheet)
-  }
+  var userMoviesArrray = omdbSArray.filter( function(omdbS) { return omdbS.addToSheet}).map(userMovieFromOmdbS)
+  userMovieArrayToSheet(dataSheet, userMoviesArrray)
   
   dataSheet.autoResizeColumns(1, dataSheet.getLastColumn())
 }
@@ -50,23 +49,4 @@ function buildTotalSheet() {
   
   
 }
-
-
-// Row   = ToAdd, Title,  Year,   IMBD reference, IMBD link
-// Types = Bool,  String, String, String,         String
-function parseMovie(row, dataSheet) {
-  var toAdd = row[0]
-  var title = row[1]
-  var id = row[3]
-  var imbdLink = row[4]
-  
-  if (toAdd) {
-    var data = [id, title, false, 0, 0, false, imbdLink]
-    dataSheet.appendRow(data)
-  }
-}
-
-
-
-
   

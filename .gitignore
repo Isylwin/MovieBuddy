@@ -5,3 +5,5 @@ node_modules/**
 
 # Clasp
 /.clasprc.json
+
+.vscode/**
