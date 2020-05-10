@@ -13,7 +13,7 @@ class UserMovie {
 }
 
 
-function omdbSToUserMovie(omdbS) {
+function userMovieFromOmdbS(omdbS) {
   var title = omdbS.title
   var seen = false
   var rewatchable = false
@@ -27,7 +27,12 @@ function omdbSToUserMovie(omdbS) {
 
 
 function userMovietoSheet(sheet, userMovie) {
-    sheet.appendRow(userMovie.asArray())
-    sheet.getRange(sheet.getLastRow(), 2, 1, 2).insertCheckboxes()
+  sheet.appendRow(userMovie.asArray())
+  sheet.getRange(sheet.getLastRow(), 2, 1, 2).insertCheckboxes()
+}
+
+
+function userMovieArrayToSheet(sheet, userMovieArray) {
+    userMovieArray.forEach( function (userMovie) { userMovietoSheet(sheet, userMovie) })  
 }
 

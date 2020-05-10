@@ -1,4 +1,4 @@
-class OMDB_S_Instance {
+class OmdbS {
   constructor(addToSheet, title, year, imdbId, imdbLink) {
     this.addToSheet = addToSheet
     this.title = title
@@ -6,45 +6,48 @@ class OMDB_S_Instance {
     this.imdbId = imdbId
     this.imdbLink = imdbLink
   }
+
+  static _size = 5;
+
+  static headers() { return new OmdbS("Add to sheet", "Title", "Year", "IMDB ID", "IMDB Link") }
+  static fromArray(value) { return new OmdbS(value[0], value[1], value[2], value[3], value[4])}
+
   asArray() { return [this.addToSheet, this.title, this.year, this.imdbId, this.imdbLink] }
 }
 
 
-function omdbSHeaders() {
-  return new OMDB_S_Instance("Add to sheet", "Title", "Year", "IMDB ID", "IMDB Link")
-}
-
-
-function omdbSDataRow(rowArray) {
+function jsonToOmdbS(jsonRow) {
   var addToSheet = false
-  var title      = rowArray[0]
-  var year       = rowArray[1]
-  var imdbId     = rowArray[2]
+  var title      = jsonRow[0]
+  var year       = jsonRow[1]
+  var imdbId     = jsonRow[2]
   var imdbLink   = "https://www.imdb.com/title/" + imdbId
 
-  return new OMDB_S_Instance(addToSheet, title, year, imdbId, imdbLink)
+  return new OmdbS(addToSheet, title, year, imdbId, imdbLink)
 }
 
 
-class OMDB_S_Data {
-  constructor(jsonResult) {
-    jsonResult.shift() //remove original headers
-    this.headers = omdbSHeaders()
-    this.data = jsonResult.map(omdbSDataRow)
-  }
+function omdbSArrayFromJsonResult(jsonResult) { 
+  jsonResult.shift()
+  return jsonResult.map(jsonToOmdbS)
 }
 
 
-function omdbSDataToSheet(sheet, omdbSData) {
-  var headers = omdbSData.headers.asArray();
-  var data = omdbSData.data
+function omdbSArrayFromSheet(sheet, rowIndex, columnIndex) {
+  var values = sheet.getRange(rowIndex, columnIndex, sheet.getLastRow() - rowIndex, OmdbS._size).getValues()
+  return values.map(OmdbS.fromArray)
+}
+
+
+function omdbSArrayToSheet(sheet, omdbSArray) {
+  var headers = OmdbS.headers().asArray();
   
   sheet.appendRow(headers);
   
   var firstData = parseInt(sheet.getLastRow()) + 1;
-  data.forEach( function(row) { sheet.appendRow( row.asArray() ) });
+  omdbSArray.forEach( function(row) { sheet.appendRow( row.asArray() ) });
   
-  sheet.getRange(firstData, 1, data.length, 1).insertCheckboxes();
+  sheet.getRange(firstData, 1, omdbSArray.length, 1).insertCheckboxes();
 }
 
 
